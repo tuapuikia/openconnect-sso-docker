@@ -8,6 +8,10 @@ RUN apt update && \
 
 RUN pip install pyqt5 PyQtWebEngine openconnect-sso
 
+COPY vpnc-script /usr/share/vpnc-scripts/vpnc-script
+
+COPY runme.sh /usr/local/bin/runme.sh
+
 RUN adduser --disabled-password --shell /bin/bash --gecos '' ubuntu
 
 RUN adduser ubuntu sudo
@@ -18,4 +22,4 @@ USER ubuntu
 
 WORKDIR /home/ubuntu
 
-ENTRYPOINT [ "/usr/local/bin/openconnect-sso" ]
+ENTRYPOINT [ "/usr/local/bin/runme.sh" ]

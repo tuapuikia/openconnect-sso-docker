@@ -1,0 +1,21 @@
+FROM python:bullseye
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && \ 
+    apt install sudo python3-pyqt5 python3-pyqt5.qtwebengine openconnect -y && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip install pyqt5 PyQtWebEngine openconnect-sso
+
+RUN adduser --disabled-password --shell /bin/bash --gecos '' ubuntu
+
+RUN adduser ubuntu sudo
+
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER ubuntu
+
+WORKDIR /home/ubuntu
+
+ENTRYPOINT [ "/usr/local/bin/openconnect-sso" ]

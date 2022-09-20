@@ -9,8 +9,6 @@ import attr
 import pkg_resources
 import structlog
 
-import time
-
 from PyQt5.QtCore import QUrl, QTimer, pyqtSlot, Qt
 from PyQt5.QtNetwork import QNetworkCookie, QNetworkProxy
 from PyQt5.QtWebEngineWidgets import (

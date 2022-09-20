@@ -12,8 +12,6 @@ COPY vpnc-script /usr/share/vpnc-scripts/vpnc-script
 
 COPY runme.sh /usr/local/bin/runme.sh
 
-COPY webengine_process.py /usr/local/lib/python3.10/site-packages/openconnect_sso/browser/webengine_process.py
-
 RUN adduser --disabled-password --shell /bin/bash --gecos '' ubuntu
 
 RUN adduser ubuntu sudo

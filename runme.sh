@@ -14,6 +14,6 @@ fi
 
 echo "Using $USER_AGENT as user-agent"
 
-/usr/local/bin/openconnect-sso $INPUT -- --useragent $USER_AGENT
+/usr/local/bin/openconnect-sso $INPUT -- --useragent "$USER_AGENT"
 
 sleep 30

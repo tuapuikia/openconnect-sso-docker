@@ -101,4 +101,11 @@ WORKDIR /home/ubuntu
 ENV DISPLAY=:0
 ENV QT_DEBUG_PLUGINS=0
 
+# Force software rendering to avoid GPU/NVIDIA driver issues in Docker
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV QT_XCB_GL_INTEGRATION=none
+ENV QT_QUICK_BACKEND=software
+ENV QTWEBENGINE_DISABLE_GPU=1
+ENV QT_X11_NO_MITSHM=1
+
 ENTRYPOINT ["/usr/local/bin/run-saml.sh"]

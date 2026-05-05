@@ -21,6 +21,13 @@ fi
 
 echo "Using $USER_AGENT as user-agent"
 
+# Start dbus-daemon if not running
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    echo "Starting dbus-daemon..."
+    eval $(dbus-launch --sh-syntax)
+    export DBUS_SESSION_BUS_ADDRESS
+fi
+
 # Run openconnect-saml
 # Pass all arguments to the connect command
 echo "Starting openconnect-saml connect..."

@@ -121,6 +121,7 @@ class Process(multiprocessing.Process):
         cfg = config.load()
 
         argv = sys.argv.copy()
+        argv += ["--disable-gpu"]
         if self.display_mode == config.DisplayMode.HIDDEN:
             argv += ["-platform", "minimal"]
         app = QApplication(argv)

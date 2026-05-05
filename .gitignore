@@ -7,4 +7,4 @@ firefox
 runme-ubuntu.sh
 Dockerfile-sso-patch
 Dockerfile
-deepthinking-flow.md
+deepthinking-*.md

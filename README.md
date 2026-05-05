@@ -15,8 +15,7 @@ Requires an X11 server running on the host.
 ```bash
 xhost +local:docker
 docker run -it --rm \
-  --cap-add=NET_ADMIN \
-  --device=/dev/net/tun \
+  --privileged \
   -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   openconnect:saml \
@@ -27,8 +26,7 @@ docker run -it --rm \
 ```bash
 xhost +local:docker
 docker run -it --rm \
-  --cap-add=NET_ADMIN \
-  --device=/dev/net/tun \
+  --privileged \
   --device=/dev/bus/usb \
   --device=/dev/hidraw0 \
   -e DISPLAY=$DISPLAY \
@@ -67,12 +65,10 @@ docker run -it --rm \
 ### X11 GUI Support
 For the SAML login window to appear, you must have an X server running:
 - **Linux:** Native X11. Run `xhost +local:docker` before starting the container.
-- **macOS:** Install [XQuartz](https://www.xquartz.org/). In Preferences -> Security, check "Allow connections from network clients" and run `xhost +localhost`.
 
-### TUN Device
-The container needs access to `/dev/net/tun` to create the VPN interface.
-- Use `--cap-add=NET_ADMIN --device=/dev/net/tun` (Recommended)
-- Or `--privileged` (Less secure)
+### TUN Device & Routing Management
+The container needs access to `/dev/net/tun` to create the VPN interface and requires privileged mode for routing management.
+- Use `--privileged` (Required for routing and TUN access)
 
 ### DNS Issues
 If the VPN connects but you can't resolve internal hostnames, you may need to mount your host's `resolv.conf`:

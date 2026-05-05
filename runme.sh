@@ -14,6 +14,9 @@ fi
 
 echo "Using $USER_AGENT as user-agent"
 
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+export SSL_CERT_DIR=/etc/ssl/certs
+
 /usr/local/bin/openconnect-sso $INPUT -- --useragent "$USER_AGENT"
 
 sleep 30

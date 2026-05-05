@@ -141,9 +141,23 @@ def on_sigterm(signum, frame):
     exit_timer.start(1000)  # ms
 
 
+class WebPage(QWebEnginePage):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def certificateError(self, error):
+        logger.warning(
+            "Certificate error",
+            description=error.errorDescription(),
+            url=error.url().toString(),
+        )
+        return True
+
+
 class WebBrowser(QWebEngineView):
     def __init__(self, auto_fill_rules, on_update):
         super().__init__()
+        self.setPage(WebPage(self))
         self._on_update = on_update
         self._auto_fill_rules = auto_fill_rules
         cookie_store = self.page().profile().cookieStore()
@@ -209,7 +223,7 @@ class WebPopupWindow(QWidget):
         super().setLayout(layout)
         layout.addWidget(self._view)
 
-        self._view.setPage(QWebEnginePage(profile, self._view))
+        self._view.setPage(WebPage(profile, self._view))
 
         self._view.titleChanged.connect(super().setWindowTitle)
         self._view.page().geometryChangeRequested.connect(

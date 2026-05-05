@@ -1,0 +1,104 @@
+FROM ubuntu:24.04
+
+# Use Azure mirror for faster package downloads
+RUN sed -i 's/archive.ubuntu.com/azure.archive.ubuntu.com/g' /etc/apt/sources.list.d/ubuntu.sources && \
+    sed -i 's/security.ubuntu.com/azure.archive.ubuntu.com/g' /etc/apt/sources.list.d/ubuntu.sources
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install core system dependencies
+RUN apt-get update && apt-get install -y \
+    openconnect \
+    vpnc-scripts \
+    python3-pip \
+    python3-venv \
+    sudo \
+    ca-certificates \
+    iptables \
+    dbus-x11 \
+    xauth \
+    x11-apps \
+    # FIDO2 / Hardware Key Dependencies
+    libfido2-dev \
+    libudev-dev \
+    libpcsclite-dev \
+    # GUI Dependencies for Qt6 WebEngine and Playwright
+    libgl1 \
+    libglx-mesa0 \
+    libgl1-mesa-dri \
+    libegl1 \
+    libfontconfig1 \
+    libdbus-1-3 \
+    libxkbcommon0 \
+    libx11-6 \
+    libxcb-cursor0 \
+    libxcb-cursor-dev \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-render-util0 \
+    libxcb-render0 \
+    libxcb-shape0 \
+    libxcb-shm0 \
+    libxcb-sync1 \
+    libxcb-util1 \
+    libxcb-xfixes0 \
+    libxcb-xinerama0 \
+    libxcb-xkb1 \
+    libxcb-xinput0 \
+    libxkbcommon-x11-0 \
+    libnss3 \
+    libasound2t64 \
+    libatk1.0-0t64 \
+    libatk-bridge2.0-0t64 \
+    libcups2t64 \
+    libdrm2 \
+    libgbm1 \
+    libnspr4 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Setup Python Virtual Environment
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Set Playwright browser path to be accessible
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright
+RUN mkdir -p $PLAYWRIGHT_BROWSERS_PATH && chown ubuntu:ubuntu $PLAYWRIGHT_BROWSERS_PATH
+
+# Install openconnect-saml with all extras
+RUN pip install --no-cache-dir "openconnect-saml[gui,chrome,fido2,tui]"
+
+# Patch webengine_process.py with custom version
+COPY webengine_process_qt6.py /tmp/webengine_process.py
+RUN find $VIRTUAL_ENV -name webengine_process.py -exec cp /tmp/webengine_process.py {} \;
+
+# Install Playwright Chromium browser
+RUN playwright install chromium && chown -R ubuntu:ubuntu $PLAYWRIGHT_BROWSERS_PATH
+
+
+# Setup user 'ubuntu' (UID 1000 is default in ubuntu:24.04)
+RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Copy custom vpnc-script if provided in workspace
+COPY vpnc-script /usr/share/vpnc-scripts/vpnc-script
+RUN chmod +x /usr/share/vpnc-scripts/vpnc-script
+
+# Copy entrypoint script
+COPY run-saml.sh /usr/local/bin/run-saml.sh
+RUN chmod +x /usr/local/bin/run-saml.sh
+
+USER ubuntu
+WORKDIR /home/ubuntu
+
+# Default DISPLAY (should be overridden at runtime)
+ENV DISPLAY=:0
+ENV QT_DEBUG_PLUGINS=0
+
+ENTRYPOINT ["/usr/local/bin/run-saml.sh"]

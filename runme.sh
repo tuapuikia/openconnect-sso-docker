@@ -19,4 +19,6 @@ export SSL_CERT_DIR=/etc/ssl/certs
 
 /usr/local/bin/openconnect-sso $INPUT -- --useragent "$USER_AGENT"
 
-sleep 30
+echo "Waiting 60 seconds for routing cleanup..."
+
+sleep 60

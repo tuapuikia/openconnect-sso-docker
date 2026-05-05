@@ -1,9 +1,9 @@
-FROM python:bullseye
+FROM python:3.11.3-bullseye
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && \ 
-    apt install sudo python3-pyqt5 python3-pyqt5.qtwebengine openconnect -y && \
+    apt install sudo python3-pyqt5 python3-pyqt5.qtwebengine openconnect ca-certificates -y && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install pyqt5 PyQtWebEngine
